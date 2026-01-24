@@ -1,11 +1,11 @@
-# Kit
+# Uni Kit
 
-Configurations, settings, and tools to set up build, debug, or development assistance, shared between repositories via git subtree. Git submodules can also be used for this purpose, but the currently selected approach is to set up dependencies as Bazel modules without submodules.
+Configurations, settings, and tools to set up build, debug, or development assistance, shared between repositories.
+Git subtree or git submodules can also be used for this purpose.
 
-## Adding Kit to a New Repository
+## Working with Repository 
 
-To add the `/uni` subtree folder to a new repository from `git@github.com:nick-dodonov/tx-kit-uni.git`:
-
+### As Git subtree
 ```bash
 # Add the remote repository
 git remote add tx-kit-uni git@github.com:nick-dodonov/tx-kit-uni.git
@@ -18,4 +18,13 @@ git subtree pull --prefix=uni tx-kit-uni main --squash
 
 # Pushing changes back to upstream
 git subtree push --prefix=uni tx-kit-uni main
+```
+
+### As Git submodule
+
+```bash
+# Add the remote repository
+git submodule add git@github.com:nick-dodonov/tx-kit-uni.git uni
+
+...
 ```
