@@ -2,4 +2,7 @@
 # To enable in module repo of tx-kit-wsp:
 # - macOS/Linux: ln -s ../tx-kit-registry local-registry
 # - Windows: mklink /D local-registry ..\tx-kit-registry
+# This config can be copied or symlinked to repo:
+# - macOS/Linux: ln -s uni/user.pre.bazelrc user.pre.bazelrc
+# - Windows: mklink user.pre.bazelrc uni\user.pre.bazelrc
 common --registry=file:///%workspace%/local-registry
