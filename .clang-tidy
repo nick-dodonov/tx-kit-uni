@@ -20,7 +20,8 @@ Checks: >
   -readability-identifier-length,
   -readability-static-definition-in-anonymous-namespace,
   -readability-uppercase-literal-suffix,
-  -readability-math-missing-parentheses
+  -readability-math-missing-parentheses,
+  -readability-identifier-length
 
 # Disabled checks explanation:
 # - alpha.*: Experimental checks, too many false positives
