@@ -5,5 +5,6 @@ services:
       dockerfile: gcc.Dockerfile
     container_name: tx-linux-gcc
     volumes:
+      - ./build/docker-root-cache:/root/.cache
       - ./:/repo
     working_dir: /repo
