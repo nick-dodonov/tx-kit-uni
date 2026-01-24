@@ -1,0 +1,4 @@
+# Use a local registry for dependencies to simplify registry development.
+# To enable in module repo of tx-kit-wsp:
+#   ln -s ../tx-kit-registry local-registry
+common --registry=file:///%workspace%/local-registry
