@@ -1,0 +1,9 @@
+services:
+  linux-gcc:
+    build: 
+      context: docker/linux
+      dockerfile: gcc.Dockerfile
+    container_name: tx-linux-gcc
+    volumes:
+      - ./:/repo
+    working_dir: /repo
