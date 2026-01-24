@@ -7,7 +7,7 @@ build --copt=-Werror=return-type                # Functions without return
 #build --copt=-Werror=unused-variable            # Unused variables
 #build --copt=-Werror=unused-parameter           # Unused parameters
 build --copt=-Werror=uninitialized              # Uninitialized variables
-build --copt=-Werror=delete-non-virtual-dtor    # Deletion through base class without virtual destructor
+build --cxxopt=-Werror=delete-non-virtual-dtor    # Deletion through base class without virtual destructor
 
 # C++ standard settings per platforms for external too (boost.asio w/ coroutines needs C++20 at least)
 # Prefer setting via env for rules_cc (BAZEL_CXXOPTS not via --cxxopt) to disable default C++17 applied
