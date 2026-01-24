@@ -3,11 +3,12 @@ common --registry=https://bcr.bazel.build/
 common --enable_platform_specific_config
 
 # GNU-like compilers (GCC, Clang) - not MSVC
+build:gnu --copt=-ffile-compilation-dir=.        # For reproducible builds (debug info paths)
 build:gnu --copt=-Werror=return-type                # Functions without return
-#build:gnu --copt=-Werror=unused-variable            # Unused variables
-#build:gnu --copt=-Werror=unused-parameter           # Unused parameters
+#build:gnu --copt=-Werror=unused-variable           # Unused variables
+#build:gnu --copt=-Werror=unused-parameter          # Unused parameters
 build:gnu --copt=-Werror=uninitialized              # Uninitialized variables
-build:gnu --cxxopt=-Werror=delete-non-virtual-dtor    # Deletion through base class without virtual destructor
+build:gnu --cxxopt=-Werror=delete-non-virtual-dtor  # Deletion through base class without virtual destructor
 
 #TODO: -Werror and /WX or /WX:NNNN
 

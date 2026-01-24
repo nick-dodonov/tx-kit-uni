@@ -35,7 +35,6 @@
 #### Build specifics
 build:debug --compilation_mode=dbg
 build:debug --spawn_strategy=local
-build:debug --copt=-ffile-compilation-dir=.
 
 build:release --compilation_mode=opt
 
