@@ -2,12 +2,19 @@ common --registry=https://raw.githubusercontent.com/nick-dodonov/tx-kit-registry
 common --registry=https://bcr.bazel.build/
 common --enable_platform_specific_config
 
-#TODO: split shared clang / msvc copt
-build --copt=-Werror=return-type                # Functions without return
-#build --copt=-Werror=unused-variable            # Unused variables
-#build --copt=-Werror=unused-parameter           # Unused parameters
-build --copt=-Werror=uninitialized              # Uninitialized variables
-build --cxxopt=-Werror=delete-non-virtual-dtor    # Deletion through base class without virtual destructor
+# GNU-like compilers (GCC, Clang) - not MSVC
+build:gnu --copt=-Werror=return-type                # Functions without return
+#build:gnu --copt=-Werror=unused-variable            # Unused variables
+#build:gnu --copt=-Werror=unused-parameter           # Unused parameters
+build:gnu --copt=-Werror=uninitialized              # Uninitialized variables
+build:gnu --cxxopt=-Werror=delete-non-virtual-dtor    # Deletion through base class without virtual destructor
+
+#TODO: -Werror and /WX or /WX:NNNN
+
+# Apply gnu config to platforms using GCC/Clang
+build:linux --config=gnu
+build:macos --config=gnu
+build:wasm --config=gnu
 
 # C++ standard settings per platforms for external too (boost.asio w/ coroutines needs C++20 at least)
 # Prefer setting via env for rules_cc (BAZEL_CXXOPTS not via --cxxopt) to disable default C++17 applied
