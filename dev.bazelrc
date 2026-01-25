@@ -62,14 +62,6 @@ build:ultra-minimal --config=strip
 #     "-Wl,-exported_symbols_list,$(location :exported_symbols.txt)",
 # ],
 
-#### Local development with preinstalled tools
-build:local-path --action_env=PATH
-build:local-path --host_action_env=PATH
-build:local-tools --extra_toolchains=@rules_foreign_cc//toolchains:preinstalled_cmake_toolchain
-build:local-tools --extra_toolchains=@rules_foreign_cc//toolchains:preinstalled_make_toolchain
-build:local-tools --extra_toolchains=@rules_foreign_cc//toolchains:preinstalled_ninja_toolchain
-build:local-tools --extra_toolchains=@rules_foreign_cc//toolchains:preinstalled_pkgconfig_toolchain
-
 #### Build platform specifics: automatically detected with --enable_platform_specific_config
 # https://bazel.build/run/bazelrc#enable_platform_specific_config
 build:macos --action_env=DEVELOPER_DIR
