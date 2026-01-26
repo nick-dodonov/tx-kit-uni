@@ -1,0 +1,14 @@
+py_binary(
+    name = "generate_build_info",
+    srcs = ["generate_build_info.py"],
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "workspace_status_scripts",
+    srcs = [
+        "workspace_status.bat",
+        "workspace_status.sh",
+    ],
+    visibility = ["//visibility:public"],
+)

@@ -4,72 +4,119 @@ Tools for generating build information (git SHA, branch, build time).
 
 ## Overview
 
-This system uses Bazel's native features:
-- **workspace_status.sh** - Script that generates build metadata
-- **linkstamp** - Special .cc file recompiled on every link with fresh build info
+This system generates build information from Bazel workspace status files using a custom file generation approach. This is necessary because Bazel's linkstamp feature doesn't work correctly on Windows with MSVC.
+
+**Platform Support:**
+- **Linux/macOS** (GCC/Clang): Linkstamp works natively with workspace status macros
+- **Windows** (MSVC): **Linkstamp does NOT receive workspace status macros** - file generation required
+
+## Why Not Linkstamp on Windows?
+
+Bazel's native linkstamp feature works correctly on Linux and macOS with GCC/Clang, where workspace status variables (like `BUILD_SCM_REVISION`, `BUILD_EMBED_LABEL`) are automatically available as preprocessor macros during linkstamp compilation.
+
+**However, on Windows with MSVC, workspace status variables are NOT injected into linkstamp compilation.** This appears to be a platform-specific limitation where MSVC doesn't receive the `/D BUILD_SCM_REVISION="..."` flags that GCC/Clang get.
+
+### Evidence
+
+When examining linkstamp compilation with `--subcommands`:
+- **Linux/macOS (GCC/Clang)**: Workspace status macros automatically present
+- **Windows (MSVC)**: No workspace status defines in compilation flags (checked `.params` file)
+
+Attempting to use variables directly:
+```cpp
+// This works on Linux/macOS:
+const char* GitSha() { return BUILD_SCM_REVISION; }
+
+// But on Windows/MSVC produces:
+// error C2065: 'BUILD_SCM_REVISION': undeclared identifier
+```
+
+No existing solutions found in Bazel GitHub issues for this specific problem.
+
+## File Generation Approach
+
+Since linkstamp doesn't work on MSVC, we use a custom Starlark rule that:
+
+1. **Accesses workspace status files** via `ctx.info_file` (stable-status.txt) and `ctx.version_file` (volatile-status.txt)
+   - ⚠️ **Note**: Names are counter-intuitive - `ctx.info_file` is stable, `ctx.version_file` is volatile
+2. **Runs Python script** (`generate_build_info.py`) to parse status files
+3. **Generates C++ source** (`Info.generated.cc`) with actual string literals
 
 ## Files
 
-### workspace_status.sh
+### workspace_status.bat
 
-Script executed by Bazel before build to collect build metadata.
+Windows batch script executed by Bazel before build to collect build metadata.
 
 **Output to volatile-status.txt** (changes on every build):
 - `BUILD_TIMESTAMP` - Build time in RFC 3339 format with timezone
+- `BUILD_SCM_REVISION` - Full git SHA
+- `BUILD_SCM_STATUS` - Git status (clean/dirty/detached-head)
+- `FORMATTED_DATE` - Human-readable build date
 
 **Output to stable-status.txt** (changes only when values change):
-- `BUILD_SCM_REVISION` - Full git SHA
-- `BUILD_SCM_STATUS` - Git status (clean/dirty)
-- `BUILD_EMBED_LABEL` - Git branch (used to get branch in linkstamp)
-- `STABLE_GIT_BRANCH` - Git branch (for other purposes)
-- `STABLE_GIT_SHA_SHORT` - Short git SHA
+- `BUILD_EMBED_LABEL` - Git branch name
+- `BUILD_HOST` - Build machine hostname
+- `BUILD_USER` - Username of build initiator
+- `STABLE_GIT_BRANCH` - Git branch (alternative key)
+- `STABLE_GIT_SHA_SHORT` - Short git SHA (8 chars)
 
-## How It Works
+### workspace_status.sh
 
-### 1. Workspace Status Command
+Unix shell script with equivalent functionality to workspace_status.bat.
 
-Bazel invokes `workspace_status.sh` before build and saves results:
-- `bazel-out/volatile-status.txt` - Frequently changing values
-- `bazel-out/stable-status.txt` - Stable values
+### generate_build_info.py
 
-```bash
-build --workspace_status_command=$(pwd)/uni/tools/build_info/workspace_status.sh
-build --stamp
+Python script that:
+- Reads `stable-status.txt` and `volatile-status.txt`
+- Extracts workspace status key-value pairs
+- Generates C++ source file with function implementations
+- Escapes strings for C++ literals
+
+### generate_build_info.bzl
+
+Starlark rule definition:
+```starlark
+generate_build_info(
+    name = "generate_build_info",
+    out = "Info.generated.cc",
+)
 ```
 
-### 2. Linkstamp
+Accesses workspace status files via `ctx.info_file` and `ctx.version_file` and invokes Python generator.
 
-Bazel converts certain keys from status files into preprocessor macros:
+## Usage
 
-**Volatile macros** (from volatile-status.txt):
-- `BUILD_TIMESTAMP` - From `BUILD_TIMESTAMP`
-- `BUILD_SCM_REVISION` - From `BUILD_SCM_REVISION`
-- `BUILD_SCM_STATUS` - From `BUILD_SCM_STATUS`
+### In BUILD.bazel:
 
-**Stable macros** (from stable-status.txt):
-- `BUILD_USER` - Automatically added by Bazel
-- `BUILD_HOST` - Automatically added by Bazel
-- `BUILD_EMBED_LABEL` - From `BUILD_EMBED_LABEL` (**used for branch!**)
+```starlark
+load("//uni/tools/build_info:generate_build_info.bzl", "generate_build_info")
 
-⚠️ **Important**: Only these keys are converted to macros! Custom keys with `STABLE_` prefix go to stable-status.txt but are NOT converted to macros in linkstamp.
+generate_build_info(
+    name = "generate_build_info",
+    out = "Build/Info.generated.cc",
+)
 
-### 3. BUILD_EMBED_LABEL for Git Branch
-
-To get git branch in linkstamp, use `BUILD_EMBED_LABEL` - the only custom key that Bazel converts to a macro:
-
-```bash
-# In workspace_status.sh
-echo "BUILD_EMBED_LABEL $GIT_BRANCH"
+cc_library(
+    name = "pkg-build",
+    srcs = ["Build/Info.generated.cc"],
+    hdrs = ["Build/Info.h"],
+    strip_include_prefix = ".",
+    visibility = ["//visibility:public"],
+)
 ```
 
-```cpp
-// In linkstamp file
-const char* Info::GitBranch() {
-    return BUILD_EMBED_LABEL;
-}
+### In .bazelrc:
+
+```bazelrc
+# For Windows builds
+build:windows --workspace_status_command=uni/tools/build_info/workspace_status.bat
+
+# For Unix builds  
+build --workspace_status_command=uni/tools/build_info/workspace_status.sh
 ```
 
-## Usage Example
+### In C++ Code:
 
 ```cpp
 #include "Build/Info.h"
@@ -82,43 +129,86 @@ std::cout << "Build User: " << Build::Info::BuildUser() << '\n';
 std::cout << "Build Host: " << Build::Info::BuildHost() << '\n';
 ```
 
-## BUILD.bazel
+## Generated Output
 
-```starlark
-cc_library(
-    name = "pkg-build",
-    hdrs = ["Build/Info.h"],
-    linkstamp = "Build/Info.linkstamp.cc",
-    strip_include_prefix = ".",
-    visibility = ["//visibility:public"],
-)
+The Python script generates C++ code like:
+
+```cpp
+// GENERATED FILE - DO NOT EDIT
+// Generated by generate_build_info.py from workspace status files
+
+#include "Build/Info.h"
+
+const char* Build::Info::GitSha() {
+    return "8e71bd8d51589a388f083cbba10c9e41c81e46ba";
+}
+
+const char* Build::Info::GitBranch() {
+    return "main";
+}
+
+const char* Build::Info::BuildTime() {
+    return "2026-01-26T23:19:26+01:00";
+}
+
+const char* Build::Info::GitStatus() {
+    return "dirty";
+}
+
+const char* Build::Info::BuildUser() {
+    return "rix";
+}
+
+const char* Build::Info::BuildHost() {
+    return "rpd";
+}
 ```
+
+## Workspace Status Keys
+
+The system uses these Bazel workspace status keys:
+
+| Key | Source | Type | Description |
+|-----|--------|------|-------------|
+| `BUILD_SCM_REVISION` | volatile-status.txt | Volatile | Full git commit SHA |
+| `BUILD_EMBED_LABEL` | stable-status.txt | Stable | Git branch name |
+| `STABLE_GIT_BRANCH` | stable-status.txt | Stable | Git branch (fallback) |
+| `BUILD_TIMESTAMP` | volatile-status.txt | Volatile | ISO 8601 timestamp |
+| `BUILD_SCM_STATUS` | volatile-status.txt | Volatile | Git working tree status |
+| `BUILD_USER` | stable-status.txt | Stable | Build user |
+| `BUILD_HOST` | stable-status.txt | Stable | Build host machine |
 
 ## Rebuild Behavior
 
-- Linkstamp is recompiled on **every link**
-- `BUILD_TIMESTAMP` changes on every build → always rebuilds
-- `BUILD_SCM_*` changes only on git state changes → rebuilds on commits/changes
+- Generated source file is created during analysis phase
+- Depends on workspace status files which are created before build
+- Rebuild triggered when:
+  - Volatile status changes (every build due to timestamp)
+  - Stable status changes (git commits, branch changes)
+  - `--stamp` is specified (default for releases)
 
 ## Timestamp Format
 
 Uses RFC 3339 with local timezone:
 ```
-2026-01-26T21:11:49+01:00
+2026-01-26T23:19:26+01:00
 ```
 
-Generated with:
-```bash
-date +"%Y-%m-%dT%H:%M:%S%z" | sed 's/\([0-9][0-9]\)$/:\1/'
-```
+## Cross-Platform Compatibility
+
+This approach works consistently across:
+- **Windows** (MSVC ARM64/x64)
+- **Linux** (GCC/Clang x86_64/ARM64)  
+- **macOS** (Clang x86_64/ARM64)
+
+## Future Improvements
+
+If Bazel adds proper workspace status macro support for MSVC linkstamps, this system could be replaced with the simpler native linkstamp approach. Until then, file generation is the most reliable cross-platform solution.
 
 ## Documentation
 
 - [Bazel User Manual: workspace-status](https://bazel.build/docs/user-manual#workspace-status)
 - [Bazel Build Encyclopedia: linkstamp](https://bazel.build/reference/be/c-cpp#cc_library.linkstamp)
-- Only BUILD_SCM_REVISION, BUILD_SCM_STATUS, BUILD_TIMESTAMP, BUILD_USER, BUILD_HOST, BUILD_EMBED_LABEL are converted to macros
+- [Starlark API: ctx.info_file and ctx.version_file](https://bazel.build/rules/lib/builtins/ctx#info_file)
 
-## Solution
-
-`BUILD_EMBED_LABEL` is the only way to pass custom values (like git branch) to linkstamp as a macro. All other custom keys (with `STABLE_` prefix or without) are not automatically converted to macros.
 
