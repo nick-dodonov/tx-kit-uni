@@ -2,6 +2,10 @@ common --registry=https://raw.githubusercontent.com/nick-dodonov/tx-kit-registry
 common --registry=https://bcr.bazel.build/
 common --enable_platform_specific_config
 
+# Workspace status for build info
+build --workspace_status_command=uni/tools/build_info/workspace_status.sh
+#TODO: add status command script for Windows
+
 # GNU-like compilers (GCC, Clang) - not MSVC
 build:gnu --copt=-Werror=return-type                # Functions without return
 #build:gnu --copt=-Werror=unused-variable            # Unused variables
