@@ -35,6 +35,9 @@ if [ -n "$GIT_SHA" ]; then
 else
     echo "BUILD_SCM_REVISION 0"
 fi
+# This forces the rebuild because STABLE_ variable is written to bazel-out/stable-status.txt
+#   https://bazel.build/docs/user-manual#workspace-status
+echo "STABLE_GIT_SHA ${GIT_SHA:-0}"
 
 # Git status - Bazel converts this to BUILD_SCM_STATUS macro
 if git diff-index --quiet HEAD -- 2>/dev/null; then

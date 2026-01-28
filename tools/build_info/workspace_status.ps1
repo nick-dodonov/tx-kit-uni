@@ -39,6 +39,9 @@ if ($gitSha) {
 } else {
     Write-Output "BUILD_SCM_REVISION 0"
 }
+# This forces the rebuild because STABLE_ variable is written to bazel-out/stable-status.txt
+#   https://bazel.build/docs/user-manual#workspace-status
+Write-Output "STABLE_GIT_SHA $(if ($gitSha) { $gitSha } else { '0' })"
 
 # Git status - Bazel converts this to BUILD_SCM_STATUS macro
 $gitStatus = "clean"

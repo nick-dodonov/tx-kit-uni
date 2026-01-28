@@ -23,6 +23,11 @@ def _generate_build_info_impl(ctx):
         ],
         mnemonic = "GenerateBuildInfo",
         progress_message = "Generating build info for %s" % ctx.label.name,
+        # # Force re-execution when volatile status changes
+        # execution_requirements = {
+        #     "no-cache": "1",
+        #     "no-remote": "1",
+        # },
     )
     
     return [DefaultInfo(files = depset([output]))]
