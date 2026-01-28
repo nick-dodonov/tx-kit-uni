@@ -203,7 +203,7 @@ This approach works consistently across:
 
 ## Future Improvements
 
-If Bazel adds proper workspace status macro support for MSVC linkstamps, this system could be replaced with the simpler native linkstamp approach. Until then, file generation is the most reliable cross-platform solution.
+If Bazel adds proper workspace status macro support for MSVC linkstamp, this system could be replaced with the simpler native linkstamp approach. Until then, file generation is the most reliable cross-platform solution.
 
 ## Documentation
 

@@ -39,3 +39,21 @@ generate_build_info = rule(
     },
     doc = "Generate C++ build info source file from workspace status.",
 )
+
+def _var_providing_rule_impl(ctx):
+    return [
+        platform_common.TemplateVariableInfo({
+            "FOO": ctx.attr.var_value,
+            "WORKSPACE_NAME": ctx.workspace_name,
+            "LABEL_NAME": ctx.label.name,
+            "LABEL_PACKAGE_NAME": ctx.label.package,
+            "LABEL_WORKSPACE_NAME": ctx.label.workspace_name,
+            "LABEL_REPO_NAME": ctx.label.repo_name,
+            "LABEL_WORKSPACE_ROOT": ctx.label.workspace_root,
+        }),
+    ]
+
+var_providing_rule = rule(
+    implementation = _var_providing_rule_impl,
+    attrs = {"var_value": attr.string()},
+)
