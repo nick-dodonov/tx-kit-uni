@@ -34,9 +34,28 @@ build:wasm --cxxopt="-std=c++23"
 build:windows --features=-default_cpp_std
 build:windows --cxxopt="/std:c++latest"
 
+#### Build platform specifics
+# https://bazel.build/run/bazelrc#enable_platform_specific_config
+build:macos --action_env=DEVELOPER_DIR
+build:macos --host_action_env=DEVELOPER_DIR
+
+build:windows --enable_runfiles
+build:windows --build_runfile_links
+
+#### Target platform specifics 
+build:wasm  --platforms=@emsdk//:platform_wasm
+# appends -wasm in output directories to not interfere w/ host builds
+# (e.g. otherwise both builds go to {--symlink_prefix}bazel-out/darwin_arm64-dbg/)
+build:wasm  --platform_suffix=wasm
+# --extra_toolchains allows to build @tx-kit-ext//tools/wasm:runner 
+#   and reference it as task under --run_under (instead of executable)
+build:wasm  --extra_toolchains=@bazel_tools//tools/python:autodetecting_toolchain
+test:wasm   --run_under="@tx-kit-ext//tools/wasm:runner --"
+run:wasm    --run_under="@tx-kit-ext//tools/wasm:runner --"
+
 # Configure boost.asio to use BoringSSL for SSL support
-build --@boost.asio//:ssl=boringssl
-build:wasm --@boost.asio//:ssl=no_ssl
+build       --@boost.asio//:ssl=boringssl
+build:wasm  --@boost.asio//:ssl=no_ssl
 
 # WASM threading support w/ boost
 #TODO: custom toolchain (tx-kit-ext) for WASM support w/ boost

@@ -5,27 +5,6 @@
 # - https://bazel.build/reference/command-line-reference
 # - https://bazel.build/reference/flag-cheatsheet
 
-#### Quick developer setup samples (to put into .dev-user.bazelrc)
-# build --enable_platform_specific_config
-# build --config=local-tools
-# build --config=debug
-# build --config=wasm
-
-#### Dependencies overrides
-# common --override_module=tx-kit-ext=../tx-kit-ext
-# common --override_module=tx-pkg-aux=../tx-pkg-aux
-# common --override_module=tx-pkg-misc=../tx-pkg-misc
-
-#### Progress and diagnostics
-# build --announce_rc
-# build --subcommands
-# build --show_timestamps
-# build --show_progress_rate_limit=1
-# build --verbose_failures
-# build --worker_verbose
-# build --sandbox_debug
-# build --explain=.explain.log --verbose_explanations
-
 #### Build differentials
 # build --host_cpu=darwin_x86_64
 # build --local_cpu_resources=16
@@ -62,25 +41,7 @@ build:ultra-minimal --config=strip
 #     "-Wl,-exported_symbols_list,$(location :exported_symbols.txt)",
 # ],
 
-#### Build platform specifics: automatically detected with --enable_platform_specific_config
-# https://bazel.build/run/bazelrc#enable_platform_specific_config
-build:macos --action_env=DEVELOPER_DIR
-build:macos --host_action_env=DEVELOPER_DIR
-
-build:windows --enable_runfiles
-build:windows --build_runfile_links
-
-#### Target platform specifics 
-build:wasm --platforms=@emsdk//:platform_wasm
-# appends -wasm in output directories to not interfere w/ host builds
-# (e.g. otherwise both builds go to {--symlink_prefix}bazel-out/darwin_arm64-dbg/)
-build:wasm --platform_suffix=wasm
-# --extra_toolchains allows to build @tx-kit-ext//tools/wasm:runner 
-#   and reference it as task under --run_under (instead of executable)
-build:wasm --extra_toolchains=@bazel_tools//tools/python:autodetecting_toolchain
-test:wasm --run_under="@tx-kit-ext//tools/wasm:runner --"
-run:wasm --run_under="@tx-kit-ext//tools/wasm:runner --"
-
+#### Build platform specifics
 #TODO: try them before setup
 # build:android --android_crosstool_top=@androidndk//:default_crosstool
 # build:android --cpu=arm64-v8a
