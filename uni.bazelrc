@@ -50,8 +50,8 @@ common:wasm --platform_suffix=wasm
 # --extra_toolchains allows to build @tx-kit-ext//tools/wasm:runner 
 #   and reference it as task under --run_under (instead of executable)
 common:wasm --extra_toolchains=@bazel_tools//tools/python:autodetecting_toolchain
-test:wasm   --run_under="@tx-kit-ext//runner --platform=wasm"
-run:wasm    --run_under="@tx-kit-ext//runner --platform=wasm"
+test:wasm   --run_under="@tx-kit-ext//runner"
+run:wasm    --run_under="@tx-kit-ext//runner"
 
 # Configure boost.asio to use BoringSSL for SSL support
 build       --@boost.asio//:ssl=boringssl
