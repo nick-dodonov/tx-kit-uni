@@ -36,6 +36,7 @@ build:windows --cxxopt="/std:c++latest"
 
 #### Build platform specifics
 # https://bazel.build/run/bazelrc#enable_platform_specific_config
+build:macos --macos_sdk_version=26.2
 build:macos --action_env=DEVELOPER_DIR
 build:macos --host_action_env=DEVELOPER_DIR
 
