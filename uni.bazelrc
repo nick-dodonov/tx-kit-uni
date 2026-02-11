@@ -1,12 +1,21 @@
 common --registry=https://raw.githubusercontent.com/nick-dodonov/tx-kit-registry/main
 common --registry=https://bcr.bazel.build/
-common --enable_platform_specific_config
 
-# Workspace status for build info
+common --enable_platform_specific_config
+common:wasm --noenable_platform_specific_config
+
+# Windows host specific: enable symlinks/runfiles and disable Python zipapp to speed up builds and runners
+startup --windows_enable_symlinks
+build --enable_runfiles
+build --build_python_zip=false # building python zip is slow and deprecated
+
+#### Workspace status for build info
+# TODO: shared workspace_status solution for WASM builds on all platforms
 build:linux --workspace_status_command=uni/tools/build_info/workspace_status.sh
 build:macos --workspace_status_command=uni/tools/build_info/workspace_status.sh
 build:windows --workspace_status_command=uni/tools/build_info/workspace_status.bat
 
+#### Compilers options
 # GNU-like compilers (GCC, Clang) - not MSVC
 build:gnu --copt=-Werror=return-type                # Functions without return
 #build:gnu --copt=-Werror=unused-variable            # Unused variables
@@ -21,7 +30,9 @@ build:clang --copt=-ffile-compilation-dir=.         # For reproducible builds (d
 build:linux --config=gnu
 build:macos --config=gnu --config=clang
 build:wasm  --config=gnu --config=clang
+build:wasm --copt="-pthread"
 
+#### C++ version
 # C++ standard settings per platforms for external too (boost.asio w/ coroutines needs C++20 at least)
 # Prefer setting via env for rules_cc (BAZEL_CXXOPTS not via --cxxopt) to disable default C++17 applied
 build:linux --repo_env=BAZEL_CXXOPTS=-std=c++23
@@ -34,7 +45,7 @@ build:wasm --cxxopt="-std=c++23"
 build:windows --features=-default_cpp_std
 build:windows --cxxopt="/std:c++latest"
 
-#### Build platform specifics
+#### Target platform specifics 
 # https://bazel.build/run/bazelrc#enable_platform_specific_config
 build:macos --macos_sdk_version=26.2
 build:macos --action_env=DEVELOPER_DIR
@@ -43,36 +54,21 @@ build:macos --host_action_env=DEVELOPER_DIR
 build:windows --enable_runfiles
 build:windows --build_runfile_links
 
-#### Target platform specifics 
 common:wasm --platforms=@emsdk//:platform_wasm
 # appends -wasm in output directories to not interfere w/ host builds
 # (e.g. otherwise both builds go to {--symlink_prefix}bazel-out/darwin_arm64-dbg/)
 common:wasm --platform_suffix=wasm
-# --extra_toolchains allows to build @tx-kit-ext//tools/wasm:runner 
-#   and reference it as task under --run_under (instead of executable)
+# --extra_toolchains is required to reference py_binary in --run_under
 common:wasm --extra_toolchains=@bazel_tools//tools/python:autodetecting_toolchain
-test:wasm   --run_under="@tx-kit-ext//runner"
-run:wasm    --run_under="@tx-kit-ext//runner"
+test:wasm   --run_under="@tx-kit-ext//runner:host"
+run:wasm    --run_under="@tx-kit-ext//runner:host"
 
+#### External dependencies configuration
 # Configure boost.asio to use BoringSSL for SSL support
 build       --@boost.asio//:ssl=boringssl
 build:wasm  --@boost.asio//:ssl=no_ssl
 
-# WASM threading support w/ boost
-#TODO: custom toolchain (tx-kit-ext) for WASM support w/ boost
-#TODO: benchmark https://github.com/WebAssembly/design/issues/1271 (-Wpthreads-mem-growth)
-build:wasm --copt="-pthread"
-#build:wasm --copt="-DBOOST_HAS_PTHREADS"
-#build:wasm --linkopt="-sALLOW_MEMORY_GROWTH=1"
-#build:wasm --linkopt="-sUSE_PTHREADS=1"
-#build:wasm --linkopt="-sWASM_BIGINT=1"
-
-#TODO: make tx-kit-ext tool for verbose output foreign rules (cmake) during build
-#   (py watchdog can be used to capture .log files created during build)
-# Current workaround example for sdl3:
-#   tail -F bazel-out/darwin_arm64-dbg/bin/external/sdl3+/sdl3_static_base_foreign_cc/CMake.log & ; bazel build @sdl3//:sdl3_static_base
-#   tail -F bazel-out/darwin_arm64-dbg-wasm/bin/external/sdl3+/sdl3_static_base_foreign_cc/CMake.log & ; bazel run demo/try-sdl3-2nd --config=wasm -- -s
-
+#### Local tools configuration and specifics
 # Local development with preinstalled tools
 build:local-path --action_env=PATH
 build:local-path --host_action_env=PATH
@@ -84,3 +80,19 @@ build:local-tools --extra_toolchains=@rules_foreign_cc//toolchains:preinstalled_
 # Windows must use local tools because it cannot build them using msvc
 build:windows --config=local-path
 build:windows --config=local-tools
+
+#### Experimental features
+# WASM threading support w/ boost
+#TODO: custom toolchain (tx-kit-ext) for WASM support w/ boost
+#TODO: benchmark https://github.com/WebAssembly/design/issues/1271 (-Wpthreads-mem-growth)
+#build:wasm --copt="-DBOOST_HAS_PTHREADS"
+#build:wasm --linkopt="-sALLOW_MEMORY_GROWTH=1"
+#build:wasm --linkopt="-sUSE_PTHREADS=1"
+#build:wasm --linkopt="-sWASM_BIGINT=1"
+
+#TODO: make tx-kit-ext tool for verbose output foreign rules (cmake) during build
+#   (py watchdog can be used to capture .log files created during build)
+# Current workaround example for sdl3:
+#   tail -F bazel-out/darwin_arm64-dbg/bin/external/sdl3+/sdl3_static_base_foreign_cc/CMake.log & ; bazel build @sdl3//:sdl3_static_base
+#   tail -F bazel-out/darwin_arm64-dbg-wasm/bin/external/sdl3+/sdl3_static_base_foreign_cc/CMake.log & ; bazel run demo/try-sdl3-2nd --config=wasm -- -s
+
