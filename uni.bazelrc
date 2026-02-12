@@ -58,10 +58,11 @@ common:wasm --platforms=@emsdk//:platform_wasm
 # appends -wasm in output directories to not interfere w/ host builds
 # (e.g. otherwise both builds go to {--symlink_prefix}bazel-out/darwin_arm64-dbg/)
 common:wasm --platform_suffix=wasm
-# --extra_toolchains is required to reference py_binary in --run_under
-common:wasm --extra_toolchains=@bazel_tools//tools/python:autodetecting_toolchain
 test:wasm   --run_under="@tx-kit-ext//runner:host"
 run:wasm    --run_under="@tx-kit-ext//runner:host"
+# --extra_toolchains is required to reference py_binary in --run_under that is built in "target" cfg
+# Unncessary anymore as runner is built in "exec" cfg now (remains as comment for custom tests that may need it)
+# common:wasm --extra_toolchains=@bazel_tools//tools/python:autodetecting_toolchain
 
 #### External dependencies configuration
 # Configure boost.asio to use BoringSSL for SSL support
