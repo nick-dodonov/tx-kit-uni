@@ -60,7 +60,7 @@ build:windows --build_runfile_links
 common:wasm --platforms=@emsdk//:platform_wasm
 # appends -wasm in output directories to not interfere w/ host builds
 # (e.g. otherwise both builds go to {--symlink_prefix}bazel-out/darwin_arm64-dbg/)
-common:wasm --platform_suffix=wasm
+# common:wasm --platform_suffix=wasm
 # common:wasm --run_under="@tx-kit-ext//runner"
 # --extra_toolchains is required to reference py_binary in --run_under that is built in "target" cfg
 # Unncessary anymore as runner is built in "exec" cfg now (remains as comment for custom tests that may need it)
