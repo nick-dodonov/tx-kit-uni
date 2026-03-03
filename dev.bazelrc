@@ -32,7 +32,7 @@ build:ultra-minimal --config=size-opt
 build:ultra-minimal --config=visibility-hidden
 build:ultra-minimal --config=lto
 build:ultra-minimal --config=strip
-#TODO: release full strip for macOS in tx_binary w/ features
+#TODO: release full strip for macOS via shared app rules w/ features
 # strip -x hello-http
 # strip -s /dev/null hello-http
 # linkopts = [

@@ -30,7 +30,10 @@ build:clang --copt=-ffile-compilation-dir=.         # For reproducible builds (d
 build:linux --config=gnu
 build:macos --config=gnu --config=clang
 build:wasm  --config=gnu --config=clang
-build:wasm --copt="-pthread"
+
+# WASM threading support w/ boost
+#TODO: allow boost compile w/o pthreads
+build --features=use_pthreads
 
 #### C++ version
 # C++ standard settings per platforms for external too (boost.asio w/ coroutines needs C++20 at least)
