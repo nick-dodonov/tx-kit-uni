@@ -109,9 +109,13 @@ build --android_platforms=@rules_android//:arm64-v8a
 #   Bazel 8 --incompatible_strict_action_env is false, Bazel 9 enables it by default, so prepare for better hermeticity
 build --incompatible_strict_action_env
 
+# FIX for cmake build on macOS otherwise "Error: $HOME must be set to run brew."
+build --action_env=HOME
+
 # TODO: resarch how to use node/emsdk/android sdk tools from integrated modules without hardcoding PATH
 #  anyway hardcoded PATH is better to setup in user's .bazelrc
 build --action_env=PATH="/opt/homebrew/bin:/usr/bin:/bin:/Users/rix/Library/Android/sdk/platform-tools"
+
 # TODO: fix occasional 
 #   bazel crashed due to an internal error. Printing stack trace:
 #   java.lang.NullPointerException: null value in entry: PATH=null
