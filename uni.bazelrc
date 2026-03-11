@@ -51,9 +51,6 @@ build --android_platforms=@rules_android//:arm64-v8a
 #   Bazel 8 --incompatible_strict_action_env is false, Bazel 9 enables it by default, so prepare for better hermeticity
 build --incompatible_strict_action_env
 
-# FIX for cmake build on macOS otherwise "Error: $HOME must be set to run brew."
-build --action_env=HOME
-
 # TODO: resarch how to use node/emsdk/android sdk tools from integrated modules without hardcoding PATH
 #  anyway hardcoded PATH is better to setup in user's .bazelrc
 build --action_env=PATH="/opt/homebrew/bin:/usr/bin:/bin:/Users/rix/Library/Android/sdk/platform-tools"
@@ -64,3 +61,9 @@ build --action_env=PATH="/opt/homebrew/bin:/usr/bin:/bin:/Users/rix/Library/Andr
 # run --run_env=PATH
 # run --test_env=PATH
 # test --test_env=PATH
+
+################################################################
+# Suppress deprecation warnings from external dependencies to reduce noise in build output (e.g. protobuf, sdl)
+build --per_file_copt=external/.*@-Wno-deprecated-declarations,-Wno-string-conversion
+# FIX for cmake build on macOS otherwise "Error: $HOME must be set to run brew."
+build --action_env=HOME
