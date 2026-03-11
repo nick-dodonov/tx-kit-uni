@@ -1,5 +1,4 @@
 # Generated Bazel configuration for development.
-# You can uncomment or change settings here as needed.
 # Useful links:
 # - https://bazel.build/reference/command-line-reference
 # - https://bazel.build/reference/flag-cheatsheet
@@ -40,25 +39,6 @@ build:ultra-minimal --config=strip
 #     "-Wl,-exported_symbols_list,$(location :exported_symbols.txt)",
 # ],
 
-#### Build platform specifics
-#TODO: try them before setup
-# build:android --android_crosstool_top=@androidndk//:default_crosstool
-# build:android --cpu=arm64-v8a
-# build:android --fat_apk_cpu=arm64-v8a,armeabi-v7a
-
-# build:ios --xcode_version_config=@bazel_tools//tools/cpp:host_xcodes
-# build:ios --apple_platform_type=ios
-# build:ios --ios_minimum_os=12.0
-
-#### Hermetic (reproducible) builds
-build:hermetic --host_action_env=-PATH
-build:hermetic --action_env=-PATH
-build:hermetic --action_env=-MAKE
-build:hermetic --action_env=-CMAKE
-build:hermetic --action_env=-NINJA
-build:hermetic --action_env=-PKG_CONFIG
-build:hermetic --sandbox_default_allow_network=false
-
 #### Build specifics for CI/CD environments
 build:ci --noshow_progress
 build:ci --curses=no
@@ -90,6 +70,3 @@ test:integration --test_timeout=300
 test:performance --test_output=all
 test:performance --test_timeout=600
 test:performance --test_env=PERFORMANCE_TEST=1
-
-#### Developer overrides and defaults
-try-import %workspace%/.dev-user.bazelrc
