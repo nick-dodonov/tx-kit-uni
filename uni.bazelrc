@@ -3,6 +3,9 @@ common --registry=https://bcr.bazel.build/
 
 common --enable_platform_specific_config
 
+# try fix "(Segmentation fault): generate-xml.sh failed: error executing TestRunner command"
+build --noexperimental_split_xml_generation
+
 #### Workspace status for build info
 build:linux --workspace_status_command=uni/tools/build_info/workspace_status.sh
 build:macos --workspace_status_command=uni/tools/build_info/workspace_status.sh
