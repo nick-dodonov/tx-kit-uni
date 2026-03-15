@@ -17,6 +17,6 @@ ignore_directories([
     ".gradle",
     ".lldb",
     # ignore source/target files for patches, but not the patch files themselves
-    "patches/*/source",
-    "patches/*/target",
+    "repo/patches/*/source",
+    "repo/patches/*/target",
 ])
