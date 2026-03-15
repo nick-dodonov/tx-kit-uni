@@ -20,6 +20,9 @@ build:local-tools --extra_toolchains=@rules_foreign_cc//toolchains:preinstalled_
 build:local-tools --extra_toolchains=@rules_foreign_cc//toolchains:preinstalled_ninja_toolchain
 build:local-tools --extra_toolchains=@rules_foreign_cc//toolchains:preinstalled_pkgconfig_toolchain
 
+#### Allow building and running platform-specific targets without explicitly specifying the platform
+build:multi --@tx-kit-ext//:multi_flag
+
 ################################################################
 # Windows default setup
 # Enable symlinks/runfiles and disable Python zipapp to speed up builds and runners
