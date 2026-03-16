@@ -38,7 +38,7 @@ def setup_target_source_map():
     external_dst = f'{output_base}/external'
 
     source_map = {
-        # С/С++ extension debugger (cppdbg) in VSCode doesn't add working dir to source map
+        # C/C++ extension debugger (cppdbg) in VSCode doesn't add working dir to source map
         ".": current_dir,
         # Relative path mapping for builds compiled/linked with -ffile-compilation-dir=. and/or --linkopt=-Wl,-oso_prefix,
         "external": external_dst,
