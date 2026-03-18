@@ -11,6 +11,8 @@ Checks: >
   -cppcoreguidelines-pro-bounds-pointer-arithmetic,
   -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
   -cppcoreguidelines-pro-type-vararg,
+  -cppcoreguidelines-non-private-member-variables-in-classes,
+  -cppcoreguidelines-avoid-do-while,
   modernize-*,
   -modernize-use-trailing-return-type,
   performance-*,
@@ -29,6 +31,8 @@ Checks: >
 # - cppcoreguidelines-avoid-magic-numbers: Acceptable in test code
 # - cppcoreguidelines-pro-bounds-*: Sometimes needed for C interop
 # - cppcoreguidelines-pro-type-vararg - Do not call c-style vararg functions (printf, etc)
+# - cppcoreguidelines-non-private-member-variables-in-classes - Test fixtures often have public member variables for ease of use
+# - cppcoreguidelines-avoid-do-while - Common pattern for macros that need to execute multiple statements
 # - modernize-use-trailing-return-type: Verbose for simple functions
 # - readability-magic-numbers: Acceptable in test code
 # - readability-convert-member-functions-to-static: Breaks coroutine awaiter protocol
