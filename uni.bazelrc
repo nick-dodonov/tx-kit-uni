@@ -44,6 +44,8 @@ build:macos --host_action_env=DEVELOPER_DIR
 ################################################################
 # WASM default setup
 common:wasm --platforms=@emsdk//:platform_wasm
+# workaround for strange emsdk behaviour (it uses the same bazel-out/darwin_arm64-dbg/bin/.. as native builds even having different configuration)
+common:wasm --platform_suffix=wasm
 # WASM boost.asio / boost.container requires pthreads #TODO: patch them
 build --features=use_pthreads
 
