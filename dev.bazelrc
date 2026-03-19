@@ -20,9 +20,10 @@ build:no-rtti --copt=-fno-rtti --copt=-DASIO_NO_TYPEID
 build:size-opt --copt=-Os
 build:visibility-hidden --copt=-fvisibility=hidden
 
-build:lto --copt=-flto
-build:lto --linkopt=-flto
-build:strip --strip=always
+build:lto --copt=-flto --linkopt=-flto
+# build:strip --strip=always  # only strips debug symbols
+build:strip --linkopt=-Wl,--strip-all  # similar to strip -s (instead of :<target>.stripped)
+build:strip --features=linker_fully_strip  # TODO: find toolchain w/ it (rules_android?)
 
 build:ultra-minimal --config=release
 build:ultra-minimal --config=no-exceptions

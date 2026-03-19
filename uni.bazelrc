@@ -71,7 +71,8 @@ build --action_env=PATH="/opt/homebrew/bin:/usr/bin:/bin:/Users/rix/Library/Andr
 # test --test_env=PATH
 
 ################################################################
-# Suppress deprecation warnings from external dependencies to reduce noise in build output (e.g. protobuf, sdl)
-build --per_file_copt=external/.*@-Wno-deprecated-declarations,-Wno-string-conversion
+# Suppress deprecation warnings from external dependencies to reduce noise in build output (e.g. protobuf in rules_android)
+build --host_per_file_copt=external/protobuf+/.*@-Wno-deprecated-declarations
+
 # FIX for cmake build on macOS otherwise "Error: $HOME must be set to run brew."
 build --action_env=HOME
