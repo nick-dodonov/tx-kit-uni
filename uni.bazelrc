@@ -61,7 +61,7 @@ build --incompatible_strict_action_env
 
 # TODO: resarch how to use node/emsdk/android sdk tools from integrated modules without hardcoding PATH
 #  anyway hardcoded PATH is better to setup in user's .bazelrc
-build --action_env=PATH="/opt/homebrew/bin:/usr/bin:/bin:/Users/rix/Library/Android/sdk/platform-tools"
+build --action_env=PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/Users/rix/Library/Android/sdk/platform-tools"
 
 # TODO: fix for windows 
 #   bazel crashed due to an internal error. Printing stack trace:
