@@ -23,7 +23,7 @@ Checks: >
   -readability-static-definition-in-anonymous-namespace,
   -readability-uppercase-literal-suffix,
   -readability-math-missing-parentheses,
-  -readability-identifier-length
+  -readability-static-accessed-through-instance
 
 # Disabled checks explanation:
 # - alpha.*: Experimental checks, too many false positives
@@ -37,6 +37,7 @@ Checks: >
 # - readability-magic-numbers: Acceptable in test code
 # - readability-convert-member-functions-to-static: Breaks coroutine awaiter protocol
 # - readability-identifier-length: Conflicts with naming conventions (variable i/j/n are common)
+# - readability-static-accessed-through-instance: False positives in codebases that do not use static member variables at all (exec::task<> functions)
 # - bugprone-exception-escape - False positives in codebases that do not use exceptions at all
 
 CheckOptions:
