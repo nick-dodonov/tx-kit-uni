@@ -51,8 +51,11 @@ build --features=use_pthreads
 
 ################################################################
 # Droid default setup
+# TODO: add configs to select default ABI in user.post.bazelrc
 common:droid --platforms=@rules_android//:arm64-v8a
 build --android_platforms=@rules_android//:arm64-v8a
+# common:droid --platforms=@rules_android//:x86_64
+# build --android_platforms=@rules_android//:x86_64
 
 ################################################################
 # Same builds with different PATH
@@ -62,6 +65,7 @@ build --incompatible_strict_action_env
 # TODO: resarch how to use node/emsdk/android sdk tools from integrated modules without hardcoding PATH
 #  anyway hardcoded PATH is better to setup in user's .bazelrc
 build --action_env=PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/Users/rix/Library/Android/sdk/platform-tools"
+# build --action_env=JAVA_HOME
 
 # TODO: fix for windows 
 #   bazel crashed due to an internal error. Printing stack trace:
@@ -72,7 +76,12 @@ build --action_env=PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/Users/r
 
 ################################################################
 # Suppress deprecation warnings from external dependencies to reduce noise in build output (e.g. protobuf in rules_android)
-build --host_per_file_copt=external/protobuf+/.*@-Wno-deprecated-declarations
+build --host_per_file_copt=external/.*@-Wno-deprecated-declarations
+
+# Suppress warning w/ rules_java (rules_android)
+#   WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+#   WARNING: sun.misc.Unsafe::arrayBaseOffset has been called by com.google.protobuf.UnsafeUtil$MemoryAccessor (file:/private/var/tmp/_bazel_nik/8a8027469951b66e04d265bf023a1ee1/external/rules_java++toolchains+remote_java_tools/java_tools/JavaBuilder_deploy.jar)
+startup --host_jvm_args=--sun-misc-unsafe-memory-access=allow
 
 # FIX for cmake build on macOS otherwise "Error: $HOME must be set to run brew."
 build --action_env=HOME
