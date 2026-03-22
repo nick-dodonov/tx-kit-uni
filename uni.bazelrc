@@ -50,12 +50,12 @@ common:wasm --platform_suffix=wasm
 build --features=use_pthreads
 
 ################################################################
-# Droid default setup
-# TODO: add configs to select default ABI in user.post.bazelrc
-common:droid --platforms=@rules_android//:arm64-v8a
-build --android_platforms=@rules_android//:arm64-v8a
-# common:droid --platforms=@rules_android//:x86_64
-# build --android_platforms=@rules_android//:x86_64
+# Droid default build/run setup
+#   must be added to user.post.bazelrc to avoid affecting other users
+common:droid-v8a --platforms=@rules_android//:arm64-v8a
+build:droid-v8a --android_platforms=@rules_android//:arm64-v8a
+common:droid-x64 --platforms=@rules_android//:x86_64
+build:droid-x64 --android_platforms=@rules_android//:x86_64
 
 ################################################################
 # Same builds with different PATH

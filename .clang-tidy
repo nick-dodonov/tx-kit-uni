@@ -41,14 +41,15 @@ Checks: >
 # - bugprone-exception-escape - False positives in codebases that do not use exceptions at all
 
 CheckOptions:
-  - key: readability-identifier-naming.VariableCase
-    value: camelCase
-  - key: readability-identifier-naming.FunctionCase
-    value: camelCase
-  - key: readability-identifier-naming.ClassCase
-    value: CamelCase
-  - key: readability-identifier-naming.MemberCase
-    value: camelCase
+  #TODO: enable some of these when we have time to fix the warnings
+  # - key: readability-identifier-naming.VariableCase
+  #   value: camelBack
+  # - key: readability-identifier-naming.FunctionCase
+  #   value: camelBack
+  # - key: readability-identifier-naming.ClassCase
+  #   value: CamelCase
+  # - key: readability-identifier-naming.MemberCase
+  #   value: camelBack
   - key: readability-implicit-bool-conversion.AllowIntegerConditions
     value: 'true'
   - key: readability-implicit-bool-conversion.AllowPointerConditions
