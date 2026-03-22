@@ -87,3 +87,5 @@ startup --host_jvm_args=--sun-misc-unsafe-memory-access=allow
 build --action_env=HOME
 # droid runners require ANDROID_HOME to find adb and other tools
 test --test_env=ANDROID_HOME
+
+# test --experimental_ui_max_stdouterr_bytes=-1
