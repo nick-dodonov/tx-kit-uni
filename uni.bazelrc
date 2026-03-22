@@ -85,3 +85,5 @@ startup --host_jvm_args=--sun-misc-unsafe-memory-access=allow
 
 # FIX for cmake build on macOS otherwise "Error: $HOME must be set to run brew."
 build --action_env=HOME
+# droid runners require ANDROID_HOME to find adb and other tools
+test --test_env=ANDROID_HOME
