@@ -24,10 +24,12 @@ Checks: >
   -readability-uppercase-literal-suffix,
   -readability-math-missing-parentheses,
   -readability-static-accessed-through-instance,
-  -readability-named-parameter
+  -readability-named-parameter,
+  -readability-isolate-declaration
 
 # Disabled checks explanation:
 # - alpha.*: Experimental checks, too many false positives
+# - bugprone-exception-escape - False positives in codebases that do not use exceptions at all
 # - cppcoreguidelines-avoid-const-or-ref-data-members: Needed for coroutine promises
 # - cppcoreguidelines-avoid-magic-numbers: Acceptable in test code
 # - cppcoreguidelines-pro-bounds-*: Sometimes needed for C interop
@@ -40,7 +42,7 @@ Checks: >
 # - readability-identifier-length: Conflicts with naming conventions (variable i/j/n are common)
 # - readability-static-accessed-through-instance: False positives in codebases that do not use static member variables at all (exec::task<> functions)
 # - readability-named-parameter: False positives in codebases that do not use named parameters at all (in template solutions, like stdexec::query)
-# - bugprone-exception-escape - False positives in codebases that do not use exceptions at all
+# - readability-isolate-declaration: False positives in codebases that do not use isolated declarations at all (in template solutions, like stdexec::query)
 
 CheckOptions:
   #TODO: enable some of these when we have time to fix the warnings
