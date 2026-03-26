@@ -54,9 +54,9 @@ build --features=use_pthreads
 #   must be added to user.post.bazelrc to avoid affecting other users
 #   build --config=implicit-droid-* for --config=multi to work (build -droid targets without --platforms setup)
 build:implicit-droid-v8a --android_platforms=@rules_android//:arm64-v8a
-common:droid-v8a --platforms=@rules_android//:arm64-v8a --config=implicit-droid-v8a
+common:droid-v8a --platforms=@rules_android//:arm64-v8a #--config=implicit-droid-v8a
 build:implicit-droid-x64 --android_platforms=@rules_android//:x86_64
-common:droid-x64 --platforms=@rules_android//:x86_64 --config=implicit-droid-x64
+common:droid-x64 --platforms=@rules_android//:x86_64 #--config=implicit-droid-x64
 
 ################################################################
 # Same builds with different PATH

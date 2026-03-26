@@ -1,6 +1,7 @@
 import os
 import shlex
 import datetime
+import pathlib
 import subprocess
 # https://lldb.llvm.org/python_api/lldb.SBDebugger.html
 # to support code completion setup used lldb package, e.g., for CLion w/ .venv python interpreter:
@@ -21,7 +22,7 @@ def lldb_cmd(command: str):
     lldb.debugger.HandleCommand(command)
 
 def setup_target_source_map():
-    '''Setup Bazel source mapping for current target.'''
+    """Setup Bazel source mapping for current target."""
     target = lldb.debugger.GetSelectedTarget()
     if target:
         print(f"""target: 
@@ -32,7 +33,14 @@ def setup_target_source_map():
     current_dir = os.getcwd()
     print(f'current_dir: {current_dir}')
 
-    output_base = bazel_output_base().strip()
+    # detect current directory is already execution_root ("bazel should not be called from a bazel output directory")
+    current_path = pathlib.Path(current_dir)
+    if current_path.name == "_main":
+        print(f'\trunning inside execution_root')
+        output_base = current_path.joinpath("../..").resolve()
+    else:
+        output_base = bazel_output_base().strip()
+
     print(f'output_base: {output_base}')
 
     external_dst = f'{output_base}/external'
