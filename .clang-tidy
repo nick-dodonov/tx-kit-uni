@@ -5,6 +5,7 @@ Checks: >
   -clang-analyzer-alpha.*,
   bugprone-*,
   -bugprone-exception-escape,
+  -bugprone-inc-dec-in-conditions,
   cppcoreguidelines-*,
   -cppcoreguidelines-avoid-const-or-ref-data-members,
   -cppcoreguidelines-avoid-magic-numbers,
@@ -31,6 +32,7 @@ Checks: >
 # Disabled checks explanation:
 # - alpha.*: Experimental checks, too many false positives
 # - bugprone-exception-escape - False positives in codebases that do not use exceptions at all
+# - bugprone-inc-dec-in-conditions - False positives in codebases that use i++/i-- in conditions intentionally (e.g. for loops)
 # - cppcoreguidelines-avoid-const-or-ref-data-members: Needed for coroutine promises
 # - cppcoreguidelines-avoid-magic-numbers: Acceptable in test code
 # - cppcoreguidelines-pro-bounds-*: Sometimes needed for C interop
