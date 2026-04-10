@@ -27,7 +27,8 @@ Checks: >
   -readability-math-missing-parentheses,
   -readability-static-accessed-through-instance,
   -readability-named-parameter,
-  -readability-isolate-declaration
+  -readability-isolate-declaration,
+  -readability-implicit-bool-conversion
 
 # Disabled checks explanation:
 # - alpha.*: Experimental checks, too many false positives
@@ -46,6 +47,7 @@ Checks: >
 # - readability-static-accessed-through-instance: False positives in codebases that do not use static member variables at all (exec::task<> functions)
 # - readability-named-parameter: False positives in codebases that do not use named parameters at all (in template solutions, like stdexec::query)
 # - readability-isolate-declaration: False positives in codebases that do not use isolated declarations at all (in template solutions, like stdexec::query)
+# - readability-implicit-bool-conversion: False positives in codebases that intentionally use implicit conversions (e.g. if (ptr) instead of if (ptr != nullptr))
 
 CheckOptions:
   #TODO: enable some of these when we have time to fix the warnings
@@ -60,6 +62,8 @@ CheckOptions:
   - key: readability-implicit-bool-conversion.AllowIntegerConditions
     value: 'true'
   - key: readability-implicit-bool-conversion.AllowPointerConditions
+    value: 'true'
+  - key: readability-implicit-bool-conversion.AllowLogicalOperatorConversion
     value: 'true'
   # https://clang.llvm.org/extra/clang-tidy/checks/cppcoreguidelines/avoid-non-const-global-variables.html
   - key: cppcoreguidelines-avoid-non-const-global-variables.AllowInternalLinkage
