@@ -37,7 +37,8 @@ build:windows --config=local-tools
 ################################################################
 # macOS default setup
 # https://bazel.build/run/bazelrc#enable_platform_specific_config
-build:macos --macos_sdk_version=26.2
+# --macos_sdk_version must be specified in user.post.bazelrc to avoid affecting other users
+# build:macos --macos_sdk_version=26.2
 build:macos --action_env=DEVELOPER_DIR
 build:macos --host_action_env=DEVELOPER_DIR
 
